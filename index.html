@@ -929,29 +929,27 @@
   <h2 class="section-title">Ultimi contenuti</h2>
   <p class="section-lead">Dal campo al canale: reportage, match coverage e analisi del calcio dilettantistico laziale.</p>
 
-  <div class="video-layout">
-    <div class="video-main">
-      <div class="video-thumb" onclick="window.open('https://www.youtube.com/@SPORTIVAMENTE_10','_blank')">
+  <!-- Featured video -->
+  <div class="video-layout" style="margin-bottom:40px;">
+    <div class="video-main" id="yt-featured">
+      <div class="video-thumb" id="yt-featured-thumb" style="cursor:pointer;">
         <div class="video-thumb-bg"></div>
-        <!-- Diagonal red stripe decoration -->
         <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.05" viewBox="0 0 640 360" preserveAspectRatio="none">
           <rect x="-100" y="0" width="200" height="500" fill="#E8001E" transform="rotate(-20 320 180)"/>
         </svg>
-        <div class="video-play">
+        <div class="video-play" id="yt-featured-play">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </div>
-        <!-- Watermark text -->
         <div style="position:absolute;bottom:16px;left:16px;z-index:1">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;font-size:32px;color:rgba(255,255,255,0.15);text-transform:uppercase;line-height:1">TGTravel<br>Sport</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;font-size:32px;color:rgba(255,255,255,0.15);text-transform:uppercase;line-height:1">SPORT<br>IVAMENTE</div>
         </div>
       </div>
       <div class="video-info">
-        <p class="video-label">Featured · YouTube</p>
-        <h3 class="video-title">Il canale del calcio<br>dilettantistico laziale</h3>
-        <p class="video-meta">Iscriviti per non perdere nessun contenuto</p>
+        <p class="video-label" id="yt-featured-label">Caricamento...</p>
+        <h3 class="video-title" id="yt-featured-title">—</h3>
+        <p class="video-meta" id="yt-featured-meta"></p>
       </div>
     </div>
-
     <div style="display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:4px;">
       <a href="https://www.youtube.com/@SPORTIVAMENTE_10" target="_blank" class="yt-cta" style="display:flex;align-items:center;gap:10px;text-decoration:none">
         <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-2.75 12.64 12.64 0 0 0-8.07 2.96A12.94 12.94 0 0 0 4 12a13 13 0 0 0 3.75 9.1 12.64 12.64 0 0 0 8.07 2.96 4.83 4.83 0 0 1 3.77-2.75A13 13 0 0 0 24 12a13 13 0 0 0-4.41-5.31M9.75 15.02h-1.5V9h1.5zm3 0h-1.5V9h1.5zm4.5 0h-1.5v-3.76L14.25 9h1.5l1 1.45L17.75 9h1.5l-1.5 2.26z"/></svg>
@@ -959,7 +957,110 @@
       </a>
     </div>
   </div>
+
+  <!-- Video grid -->
+  <div id="yt-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px;background:rgba(255,255,255,0.05);">
+    <!-- Populated by JS -->
+  </div>
+
+  <div id="yt-error" style="display:none;padding:20px;color:var(--muted);font-size:14px;text-align:center;">
+    Impossibile caricare i video. <a href="https://www.youtube.com/@SPORTIVAMENTE_10" target="_blank" style="color:var(--red);">Guarda il canale su YouTube →</a>
+  </div>
 </section>
+
+<script>
+(function() {
+  const API_KEY    = 'AIzaSyDXEbSeT03KIV37iGy_gu-vaXPpwqrQOtk';
+  const CHANNEL_ID = 'UCQCecG57uvpIm2_cWY4TAHg';
+  const MAX        = 7;
+
+  function timeAgo(iso) {
+    const diff = (Date.now() - new Date(iso)) / 1000;
+    if (diff < 3600)  return Math.floor(diff/60) + ' min fa';
+    if (diff < 86400) return Math.floor(diff/3600) + ' ore fa';
+    if (diff < 2592000) return Math.floor(diff/86400) + ' giorni fa';
+    if (diff < 31536000) return Math.floor(diff/2592000) + ' mesi fa';
+    return Math.floor(diff/31536000) + ' anni fa';
+  }
+
+  function openVideo(videoId) {
+    window.open('https://www.youtube.com/watch?v=' + videoId, '_blank');
+  }
+
+  function renderFeatured(v) {
+    const thumb = document.getElementById('yt-featured-thumb');
+    const label = document.getElementById('yt-featured-label');
+    const title = document.getElementById('yt-featured-title');
+    const meta  = document.getElementById('yt-featured-meta');
+
+    // background thumbnail
+    thumb.style.backgroundImage = 'url(' + v.thumb + ')';
+    thumb.style.backgroundSize  = 'cover';
+    thumb.style.backgroundPosition = 'center';
+    thumb.onclick = () => openVideo(v.id);
+
+    label.textContent = 'Ultimo video · YouTube';
+    title.textContent = v.title;
+    meta.textContent  = timeAgo(v.published);
+  }
+
+  function renderGrid(videos) {
+    const grid = document.getElementById('yt-grid');
+    grid.innerHTML = '';
+    videos.slice(1).forEach(function(v, i) {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--card);padding:0;cursor:pointer;border:1px solid var(--border);transition:border-color 0.2s;';
+      card.onmouseenter = () => card.style.borderColor = 'var(--red-dim)';
+      card.onmouseleave = () => card.style.borderColor = 'var(--border)';
+      card.onclick = () => openVideo(v.id);
+      card.innerHTML =
+        '<div style="aspect-ratio:16/9;background:url(' + v.thumb + ') center/cover no-repeat;position:relative;">' +
+          '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.2);"></div>' +
+          '<div style="position:absolute;bottom:8px;right:8px;background:var(--red);width:28px;height:28px;display:flex;align-items:center;justify-content:center;clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);">' +
+            '<svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#fff;margin-left:2px;"><path d="M8 5v14l11-7z"/></svg>' +
+          '</div>' +
+        '</div>' +
+        '<div style="padding:14px 16px;">' +
+          '<div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.03em;color:var(--text);line-height:1.2;margin-bottom:6px;">' + v.title + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);">' + timeAgo(v.published) + '</div>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  fetch(
+    'https://www.googleapis.com/youtube/v3/search' +
+    '?key=' + API_KEY +
+    '&channelId=' + CHANNEL_ID +
+    '&part=snippet' +
+    '&order=date' +
+    '&type=video' +
+    '&maxResults=' + MAX
+  )
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.items || data.items.length === 0) throw new Error('no items');
+    const videos = data.items.map(function(item) {
+      return {
+        id:        item.id.videoId,
+        title:     item.snippet.title,
+        thumb:     item.snippet.thumbnails.medium.url,
+        published: item.snippet.publishedAt
+      };
+    });
+    renderFeatured(videos[0]);
+    if (videos.length > 1) renderGrid(videos);
+  })
+  .catch(function() {
+    document.getElementById('yt-error').style.display = 'block';
+    document.getElementById('yt-featured-label').textContent = 'Featured · YouTube';
+    document.getElementById('yt-featured-title').textContent = 'Il canale del calcio vero';
+    document.getElementById('yt-featured-meta').textContent  = 'Iscriviti per non perdere nessun contenuto';
+    document.getElementById('yt-featured-thumb').onclick = () =>
+      window.open('https://www.youtube.com/@SPORTIVAMENTE_10','_blank');
+  });
+})();
+</script>
 
 <hr class="divider">
 
