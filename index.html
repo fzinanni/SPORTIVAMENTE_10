@@ -987,17 +987,24 @@
     window.open('https://www.youtube.com/watch?v=' + videoId, '_blank');
   }
 
+  function playInline(videoId) {
+    const thumb = document.getElementById('yt-featured-thumb');
+    thumb.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;"></iframe>';
+    thumb.style.backgroundImage = 'none';
+    thumb.style.cursor = 'default';
+    thumb.onclick = null;
+  }
+
   function renderFeatured(v) {
     const thumb = document.getElementById('yt-featured-thumb');
     const label = document.getElementById('yt-featured-label');
     const title = document.getElementById('yt-featured-title');
     const meta  = document.getElementById('yt-featured-meta');
 
-    // background thumbnail
     thumb.style.backgroundImage = 'url(' + v.thumb + ')';
     thumb.style.backgroundSize  = 'cover';
     thumb.style.backgroundPosition = 'center';
-    thumb.onclick = () => openVideo(v.id);
+    thumb.onclick = () => playInline(v.id);
 
     label.textContent = 'Ultimo video · YouTube';
     title.textContent = v.title;
