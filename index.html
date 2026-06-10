@@ -1048,12 +1048,10 @@ function caricaYoutube() {
   }
 
   fetch(
-    'https://www.googleapis.com/youtube/v3/search' +
+    'https://www.googleapis.com/youtube/v3/playlistItems' +
     '?key=' + API_KEY +
-    '&channelId=' + CHANNEL_ID +
+    '&playlistId=UUQCecG57uvpIm2_cWY4TAHg' +
     '&part=snippet' +
-    '&order=date' +
-    '&type=video' +
     '&maxResults=' + MAX
   )
   .then(function(r) { return r.json(); })
@@ -1061,7 +1059,7 @@ function caricaYoutube() {
     if (!data.items || data.items.length === 0) throw new Error('no items');
     const videos = data.items.map(function(item) {
       return {
-        id:        item.id.videoId,
+        id:        item.snippet.resourceId.videoId,
         title:     item.snippet.title,
         thumb:     item.snippet.thumbnails.medium.url,
         published: item.snippet.publishedAt
