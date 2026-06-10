@@ -1295,11 +1295,37 @@
           <label for="f-msg">Messaggio</label>
           <textarea id="f-msg" placeholder="Raccontaci la tua situazione..."></textarea>
         </div>
-        <button type="button" class="form-submit" onclick="alert('Grazie! Risponderemo entro 48 ore.')">Invia messaggio</button>
+        <button type="button" class="form-submit" onclick="inviaMessaggio()">Invia messaggio</button>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+function inviaMessaggio() {
+  var nome    = document.getElementById('f-nome').value.trim();
+  var societa = document.getElementById('f-societa').value.trim();
+  var email   = document.getElementById('f-email').value.trim();
+  var oggetto = document.getElementById('f-oggetto').value;
+  var msg     = document.getElementById('f-msg').value.trim();
+
+  if (!nome || !email || !msg) {
+    alert('Per favore compila almeno Nome, Email e Messaggio.');
+    return;
+  }
+
+  var subject = encodeURIComponent('SPORTIVAMENTE – ' + (oggetto || 'Contatto dal sito'));
+  var body    = encodeURIComponent(
+    'Nome: ' + nome + '\n' +
+    (societa ? 'Società: ' + societa + '\n' : '') +
+    'Email: ' + email + '\n' +
+    (oggetto ? 'Interesse: ' + oggetto + '\n' : '') +
+    '\nMessaggio:\n' + msg
+  );
+
+  window.location.href = 'mailto:fzinanni@gmail.com?subject=' + subject + '&body=' + body;
+}
+</script>
 
 <!-- FOOTER -->
 <footer>
